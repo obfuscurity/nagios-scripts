@@ -17,16 +17,16 @@ my $fstab_fs = get_fstab_fs();
 my $errors;
 for my $file (keys %$fstab_fs) {
   unless ($fstab_fs->{$file}->{'device'} eq $mount_fs->{$file}->{'device'}) {
-    $errors .= "/etc/fstab errorss $file should be mounted on $fstab_fs->{$file}->{'device'}\; ";
-    $errors .= "/proc/mounts errorss $file is mounted on $mount_fs->{$file}->{'device'}\; ";
+    $errors .= "/etc/fstab reports $file should be mounted on $fstab_fs->{$file}->{'device'}\; ";
+    $errors .= "/proc/mounts reports $file is mounted on $mount_fs->{$file}->{'device'}\; ";
   }
   unless ($fstab_fs->{$file}->{'fstype'} eq $mount_fs->{$file}->{'fstype'}) {
-    $errors .= "/etc/fstab errorss $file should be fs type $fstab_fs->{$file}->{'fstype'}\; ";
-    $errors .= "/proc/mounts errorss $file is fs type $mount_fs->{$file}->{'fstype'}\; ";
+    $errors .= "/etc/fstab reports $file should be fs type $fstab_fs->{$file}->{'fstype'}\; ";
+    $errors .= "/proc/mounts reports $file is fs type $mount_fs->{$file}->{'fstype'}\; ";
   }
   unless ($fstab_fs->{$file}->{'writeable'} eq $mount_fs->{$file}->{'writeable'}) {
-    $errors .= "/etc/fstab errorss $file should be writeable = $fstab_fs->{$file}->{'writeable'} (1=rw,0=ro)\; ";
-    $errors .= "/proc/mounts errorss $file is mounted writeable = $mount_fs->{$file}->{'writeable'} (1=rw,0=ro)\; ";
+    $errors .= "/etc/fstab reports $file should be writeable = $fstab_fs->{$file}->{'writeable'} (1=rw,0=ro)\; ";
+    $errors .= "/proc/mounts reports $file is mounted writeable = $mount_fs->{$file}->{'writeable'} (1=rw,0=ro)\; ";
   }
 }
 
