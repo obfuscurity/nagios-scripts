@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Data::Dumper;
+
+# TO DO:
+# inspect swap
+
+my $valid_fs = get_valid_fstypes();
+my $mount_fs = get_mounted_fs();
+my $fstab_fs = get_fstab_fs();
+
+#print Dumper($valid_fs);
+#print Dumper($mount_fs);
+#print Dumper($fstab_fs);
+
+my $errors;
+for my $file (keys %$fstab_fs) {
+  unless ($fstab_fs->{$file}->{'device'} eq $mount_fs->{$file}->{'device'}) {
+    $errors .= "/etc/fstab errorss $file should be mounted on $fstab_fs->{$file}->{'device'}\; ";
+    $errors .= "/proc/mounts errorss $file is mounted on $mount_fs->{$file}->{'device'}\; ";
+  }
+  unless ($fstab_fs->{$file}->{'fstype'} eq $mount_fs->{$file}->{'fstype'}) {
+    $errors .= "/etc/fstab errorss $file should be fs type $fstab_fs->{$file}->{'fstype'}\; ";
+    $errors .= "/proc/mounts errorss $file is fs type $mount_fs->{$file}->{'fstype'}\; ";
+  }
+  unless ($fstab_fs->{$file}->{'writeable'} eq $mount_fs->{$file}->{'writeable'}) {
+    $errors .= "/etc/fstab errorss $file should be writeable = $fstab_fs->{$file}->{'writeable'} (1=rw,0=ro)\; ";
+    $errors .= "/proc/mounts errorss $file is mounted writeable = $mount_fs->{$file}->{'writeable'} (1=rw,0=ro)\; ";
+  }
+}
+
+if ($errors) {
+  print "MOUNTS CRITICAL: $errors\n";
+  exit 2;
+} else {
+  print "MOUNTS OK\n";
+  exit 0;
+}
+
+exit;
+
+sub get_valid_fstypes {
+  open(IN, '/proc/filesystems') || die "Unable to read: $!";
+  my %results;
+  while (<IN>) {
+    next if /^nodev/;
+    /^\s+(\w+)$/;
+    $results{$1} = 1;
+  }
+  close(IN);
+  return \%results;
+}
+
+sub get_mounted_fs {
+  open(IN, '/proc/mounts') || die "Unable to read: $!";
+  my %results;
+  while (<IN>) {
+    my ($spec, $file, $vfstype, $mntops, $freq, $passno) = split(/ /, $_);
+    next unless ($valid_fs->{$vfstype});
+    $results{$file} = {
+      device => $spec,
+      options => $mntops,
+      fstype => $vfstype,
+      writeable => ($mntops =~ /^rw/ ? 1 : 0),
+    };
+  }
+  close(IN);
+  return \%results;
+}
+
+sub get_fstab_fs {
+  open(IN, '/etc/fstab') || die "Unable to read: $!";
+  my %results;
+  while (<IN>) {
+    my ($spec, $file, $vfstype, $mntops, $freq, $passno) = split(/\s+/, $_);
+    next unless ($valid_fs->{$vfstype});
+    $results{$file} = {
+      device => $spec,
+      options => $mntops,
+      fstype => $vfstype,
+      writeable => ($mntops =~ /^(defaults|rw)/ ? 1 : 0),
+    };
+  }
+  close(IN);
+  return \%results;
+}
+
