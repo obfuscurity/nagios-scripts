@@ -2,6 +2,7 @@
 
 use strict;
 use Data::Dumper;
+use Cwd qw/abs_path/;
 
 # TO DO:
 # inspect swap
@@ -59,7 +60,7 @@ sub get_mounted_fs {
     my ($spec, $file, $vfstype, $mntops, $freq, $passno) = split(/ /, $_);
     next unless ($valid_fs->{$vfstype});
     $results{$file} = {
-      device => $spec,
+      device => ($spec =~ m(/dev/root) ? resolve_rootfs_device() : $spec ),
       options => $mntops,
       fstype => $vfstype,
       writeable => ($mntops =~ /^rw/ ? 1 : 0),
@@ -69,6 +70,27 @@ sub get_mounted_fs {
   return \%results;
 }
 
+sub resolve_rootfs_device {
+  my $device;
+  my @rootfs_stat = stat('/dev/root');
+  opendir(DIR, '/dev') || die "Unable to opendir: $!";
+  while ($device = readdir(DIR)) {
+    my @device_stat = stat('/dev/' . $device);
+    next unless $rootfs_stat[6] eq $device_stat[6];
+    return '/dev/' . $device unless $device eq 'root';
+  }
+  closedir(DIR);
+}
+
+sub resolve_device_label {
+  my $labeled_devname = shift;
+  if ($labeled_devname eq '/') {
+    return resolve_rootfs_device();
+  } else {
+    return abs_path('/dev/disk/by-label/' . $labeled_devname);
+  }
+}
+
 sub get_fstab_fs {
   open(IN, '/etc/fstab') || die "Unable to read: $!";
   my %results;
@@ -76,7 +98,7 @@ sub get_fstab_fs {
     my ($spec, $file, $vfstype, $mntops, $freq, $passno) = split(/\s+/, $_);
     next unless ($valid_fs->{$vfstype});
     $results{$file} = {
-      device => $spec,
+      device => ($spec =~ /^LABEL=(\S+)$/ ? resolve_device_label($1) : $spec),
       options => $mntops,
       fstype => $vfstype,
       writeable => ($mntops =~ /^(defaults|rw)/ ? 1 : 0),
