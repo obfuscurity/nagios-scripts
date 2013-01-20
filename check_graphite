@@ -12,7 +12,7 @@ EXIT_UNKNOWN = 3
 @@options = {}
 
 optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: check_graphite.rb [options]"
+  opts.banner = "Usage: #{File.basename($0)} [options]"
 
   @@options[:url] = nil
   opts.on("-u", "--url URL", "Target url") do |url|
