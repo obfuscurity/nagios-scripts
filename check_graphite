@@ -43,7 +43,7 @@ end
 optparse.parse!
 
 if (@@options[:url].nil? || @@options[:metric].nil? || @@options[:warning].nil? || @@options[:critical].nil?)
-  p optparse
+  puts optparse
   exit 2
 end
 
