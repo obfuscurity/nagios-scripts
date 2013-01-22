@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require "rubygems"
 require "optparse"
 require "rest-client"
 require "json"
@@ -21,6 +22,10 @@ optparse = OptionParser.new do |opts|
   @@options[:metric] = nil
   opts.on("-m", "--metric NAME", "Metric path string") do |metric|
     @@options[:metric] = metric
+  end
+  @@options[:shortname] = nil
+  opts.on("-s", "--shortname SHORTNAME", "Metric short name (used for performance data)") do |shortname|
+    @@options[:shortname] = shortname
   end
   @@options[:duration] = 5
   opts.on("-d", "--duration LENGTH", "Length, in minute of data to parse (default: 5)") do |duration|
@@ -71,27 +76,29 @@ JSON.parse(RestClient.get(url)).each do |cache|
 end
 
 total = data["total"].to_i
+perfdata = ""
+perfdata = "| #{@@options[:shortname]}=#{total}" if !@@options[:shortname].nil?
 
 if (@@options[:critical].to_i > @@options[:warning].to_i)
   if (total >= @@options[:critical].to_i)
-    puts "CRITICAL metric count: #{total}"
+    puts "CRITICAL metric count: #{total} #{perfdata}"
     exit EXIT_CRITICAL
   elsif (total >= @@options[:warning].to_i)
-    puts "WARNING metric count: #{total}"
+    puts "WARNING metric count: #{total} #{perfdata}"
     exit EXIT_WARNING
   else
-    puts "OK metric count: #{total}"
+    puts "OK metric count: #{total} #{perfdata}"
     exit EXIT_OK
   end
 else
   if (total <= @@options[:critical].to_i)
-    puts "CRITICAL metric count: #{total}"
+    puts "CRITICAL metric count: #{total} #{perfdata}"
     exit EXIT_CRITICAL
   elsif (total <= @@options[:warning].to_i)
-    puts "WARNING metric count: #{total}"
+    puts "WARNING metric count: #{total} #{perfdata}"
     exit EXIT_WARNING
   else
-    puts "OK metric count: #{total}"
+    puts "OK metric count: #{total} #{perfdata}"
     exit EXIT_OK
   end
 end
