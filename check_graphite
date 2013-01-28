@@ -71,6 +71,9 @@ JSON.parse(RestClient.get(url)).each do |cache|
       count += 1
     end
   end
+  if (count == 0)
+    count = 1
+  end
   data["#{cache['target']}"] /= count
   data["total"] += data["#{cache['target']}"]
 end
