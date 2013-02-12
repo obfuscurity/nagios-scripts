@@ -31,6 +31,10 @@ optparse = OptionParser.new do |opts|
   opts.on("-d", "--duration LENGTH", "Length, in minute of data to parse (default: 5)") do |duration|
     @@options[:duration] = duration
   end
+  @@options[:function] = "average"
+  opts.on("-f", "--function \[average \| sum\]", "Function applied to metrics for thresholds (default: average)") do |function|
+    @@options[:function] = function
+  end
   @@options[:warning] = nil
   opts.on("-w", "--warning VALUE", "Warning threshold") do |warning|
     @@options[:warning] = warning
@@ -71,10 +75,9 @@ JSON.parse(RestClient.get(url)).each do |cache|
       count += 1
     end
   end
-  if (count == 0)
-    count = 1
+  if (@@options[:function] == "average")
+    data["#{cache['target']}"] /= count  
   end
-  data["#{cache['target']}"] /= count
   data["total"] += data["#{cache['target']}"]
 end
 
