@@ -88,7 +88,7 @@ total = data["total"].to_i
 perfdata = ""
 perfdata = "| #{@@options[:shortname]}=#{total}" if !@@options[:shortname].nil?
 
-if (@@options[:critical].to_i > @@options[:warning].to_i)
+if (@@options[:critical].to_i >= @@options[:warning].to_i)
   if (total >= @@options[:critical].to_i)
     puts "CRITICAL metric count: #{total} #{perfdata}"
     exit EXIT_CRITICAL
