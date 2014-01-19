@@ -117,7 +117,7 @@ if (@@options[:critical].to_i > @@options[:warning].to_i)
     puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{perfdata}"
     exit EXIT_WARNING
   else
-    puts "OK metric count: #{total} #{perfdata}"
+    puts "OK #{@@options[:message]} #{total}#{@@options[:units]} #{perfdata}"
     exit EXIT_OK
   end
 else
