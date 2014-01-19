@@ -124,7 +124,7 @@ else
     puts "WARNING metric count: #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{perfdata}"
     exit EXIT_WARNING
   else
-    puts "OK metric count: #{total} #{perfdata}"
+    puts "OK metric count: #{total}#{@@options[:units]} #{perfdata}"
     exit EXIT_OK
   end
 end
