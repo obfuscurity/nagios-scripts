@@ -103,10 +103,10 @@ perfdata = "| #{@@options[:shortname]}=#{total}" if !@@options[:shortname].nil?
 
 if (@@options[:critical].to_i > @@options[:warning].to_i)
   if (total >= @@options[:critical].to_i)
-    puts "CRITICAL metric count: #{total} #{perfdata}"
+    puts "CRITICAL metric count: #{total} threshold: #{@@options[:critical]} #{perfdata}"
     exit EXIT_CRITICAL
   elsif (total >= @@options[:warning].to_i)
-    puts "WARNING metric count: #{total} #{perfdata}"
+    puts "WARNING metric count: #{total} threshold: #{@@options[:warning]} #{perfdata}"
     exit EXIT_WARNING
   else
     puts "OK metric count: #{total} #{perfdata}"
@@ -114,10 +114,10 @@ if (@@options[:critical].to_i > @@options[:warning].to_i)
   end
 else
   if (total <= @@options[:critical].to_i)
-    puts "CRITICAL metric count: #{total} #{perfdata}"
+    puts "CRITICAL metric count: #{total} threshold: #{@@options[:critical]} #{perfdata}"
     exit EXIT_CRITICAL
   elsif (total <= @@options[:warning].to_i)
-    puts "WARNING metric count: #{total} #{perfdata}"
+    puts "WARNING metric count: #{total} threshold: #{@@options[:warning]} #{perfdata}"
     exit EXIT_WARNING
   else
     puts "OK metric count: #{total} #{perfdata}"
