@@ -47,6 +47,10 @@ optparse = OptionParser.new do |opts|
   opts.on("-U", "--units VALUE", "Adds a text tag to the metric count in the plugin output. Useful to identify the metric units. Doesn't affect data queries.") do |units|
     @@options[:units] = units
   end
+  @@options[:message] = "metric count:"
+  opts.on("-M", "--message VALUE", "Text message to output (default: \"metric count:\")") do |message|
+    @@options[:message] = message
+  end
   @@options[:zero_on_error] = false
   opts.on("-z", "--zero-on-error", "Return 0 on a graphite 500 error") do |zero_on_error|
     @@options[:zero_on_error] = zero_on_error
@@ -107,24 +111,24 @@ perfdata = "| #{@@options[:shortname]}=#{total}" if !@@options[:shortname].nil?
 
 if (@@options[:critical].to_i > @@options[:warning].to_i)
   if (total >= @@options[:critical].to_i)
-    puts "CRITICAL metric count: #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{perfdata}"
+    puts "CRITICAL #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{perfdata}"
     exit EXIT_CRITICAL
   elsif (total >= @@options[:warning].to_i)
-    puts "WARNING metric count: #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{perfdata}"
+    puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{perfdata}"
     exit EXIT_WARNING
   else
-    puts "OK metric count: #{total} #{perfdata}"
+    puts "OK #{@@options[:message]} #{total}#{@@options[:units]} #{perfdata}"
     exit EXIT_OK
   end
 else
   if (total <= @@options[:critical].to_i)
-    puts "CRITICAL metric count: #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{perfdata}"
+    puts "CRITICAL #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{perfdata}"
     exit EXIT_CRITICAL
   elsif (total <= @@options[:warning].to_i)
-    puts "WARNING metric count: #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{perfdata}"
+    puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{perfdata}"
     exit EXIT_WARNING
   else
-    puts "OK metric count: #{total}#{@@options[:units]} #{perfdata}"
+    puts "OK #{@@options[:message]} #{total}#{@@options[:units]} #{perfdata}"
     exit EXIT_OK
   end
 end
