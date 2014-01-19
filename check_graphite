@@ -44,7 +44,7 @@ optparse = OptionParser.new do |opts|
     @@options[:critical] = critical
   end
   @@options[:units] = nil
-  opts.on("-U", "--units VALUE", "Units for the metric") do |units|
+  opts.on("-U", "--units VALUE", "Adds a text tag to the metric count in the plugin output. Useful to identify the metric units. Doesn't affect data queries.") do |units|
     @@options[:units] = units
   end
   @@options[:zero_on_error] = false
