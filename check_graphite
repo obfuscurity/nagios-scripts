@@ -79,22 +79,27 @@ data = {}
 data["total"] = 0
 
 begin
-  JSON.parse(RestClient.get(URI.encode(url))).each do |cache|
-    data["#{cache['target']}"] = 0
-    count = 0
-    cache["datapoints"].each do |point|
-      unless (point[0].nil?)
-        data["#{cache['target']}"] += point[0]
-        count += 1
+  if JSON.parse(RestClient.get(URI.encode(url))).empty?
+    puts "UNKNOWN no data reported by Graphite"
+    exit EXIT_UNKNOWN
+  else
+    JSON.parse(RestClient.get(URI.encode(url))).each do |cache|
+      data["#{cache['target']}"] = 0
+      count = 0
+      cache["datapoints"].each do |point|
+        unless (point[0].nil?)
+          data["#{cache['target']}"] += point[0]
+          count += 1
+        end
       end
+      if (count == 0)
+        count = 1
+      end
+      if (@@options[:function] == "average")
+        data["#{cache['target']}"] /= count
+      end
+      data["total"] += data["#{cache['target']}"]
     end
-    if (count == 0)
-      count = 1
-    end
-    if (@@options[:function] == "average")
-      data["#{cache['target']}"] /= count  
-    end
-    data["total"] += data["#{cache['target']}"]
   end
 rescue RestClient::InternalServerError
   if @@options[:zero_on_error]
