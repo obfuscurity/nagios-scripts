@@ -55,6 +55,10 @@ optparse = OptionParser.new do |opts|
   opts.on("-z", "--zero-on-error", "Return 0 on a graphite 500 error") do |zero_on_error|
     @@options[:zero_on_error] = zero_on_error
   end
+  @@options[:link_graph] = false
+  opts.on("-l", "--link-graph", "Add a link in the plugin output, showing a 24h graph for this metric in graphite. Requires 'escape_html_tags=0' option in cgi.cfg nagios config file") do |link_graph|
+    @@options[:link_graph] = link_graph
+  end
   opts.on( "-h", "--help", "Display this screen" ) do
     puts opts
     exit
@@ -74,6 +78,15 @@ def url
   duration = @@options[:duration].to_s
   base_url + "/render/?target=" + metric + "&format=json&from=-" + duration + "mins"
 end
+
+def output_url
+  base_url = @@options[:url]
+  metric = @@options[:metric]
+  if @@options[:link_graph]  
+    "<a href=\"http://" + base_url + "/render/?target=" + URI.escape(metric) + "&from=-24h&width=700&height=450\"> 24h graph </a>"
+  end
+end  
+
 
 data = {}
 data["total"] = 0
@@ -116,24 +129,24 @@ perfdata = "| #{@@options[:shortname]}=#{total}" if !@@options[:shortname].nil?
 
 if (@@options[:critical].to_i > @@options[:warning].to_i)
   if (total >= @@options[:critical].to_i)
-    puts "CRITICAL #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{perfdata}"
+    puts "CRITICAL #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{output_url} #{perfdata}"
     exit EXIT_CRITICAL
   elsif (total >= @@options[:warning].to_i)
-    puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{perfdata}"
+    puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{output_url} #{perfdata}"
     exit EXIT_WARNING
   else
-    puts "OK #{@@options[:message]} #{total}#{@@options[:units]} #{perfdata}"
+    puts "OK #{@@options[:message]} #{total}#{@@options[:units]} #{output_url} #{perfdata}"
     exit EXIT_OK
   end
 else
   if (total <= @@options[:critical].to_i)
-    puts "CRITICAL #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{perfdata}"
+    puts "CRITICAL #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{output_url} #{perfdata}"
     exit EXIT_CRITICAL
   elsif (total <= @@options[:warning].to_i)
-    puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{perfdata}"
+    puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{output_url} #{perfdata}"
     exit EXIT_WARNING
   else
-    puts "OK #{@@options[:message]} #{total}#{@@options[:units]} #{perfdata}"
+    puts "OK #{@@options[:message]} #{total}#{@@options[:units]} #{output_url} #{perfdata}"
     exit EXIT_OK
   end
 end
