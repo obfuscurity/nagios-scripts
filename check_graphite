@@ -83,7 +83,7 @@ def output_url
   base_url = @@options[:url]
   metric = @@options[:metric]
   if @@options[:link_graph]  
-    "<a href=\"http://" + base_url + "/render/?target=" + URI.escape(metric) + "&from=-24h&width=700&height=450\"> 24h graph </a>"
+    "<a target=\"_blank\" href=\"http://" + base_url + "/render/?target=" + URI.escape(metric) + "&from=-24h&width=700&height=450\"> 24h graph </a>"
   end
 end  
 
