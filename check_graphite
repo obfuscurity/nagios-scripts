@@ -123,15 +123,15 @@ rescue RestClient::InternalServerError
   end
 end
 
-total = data["total"].to_i
+total = data["total"].to_f
 perfdata = ""
 perfdata = "| #{@@options[:shortname]}=#{total}" if !@@options[:shortname].nil?
 
-if (@@options[:critical].to_i > @@options[:warning].to_i)
-  if (total >= @@options[:critical].to_i)
+if (@@options[:critical].to_f > @@options[:warning].to_f)
+  if (total >= @@options[:critical].to_f)
     puts "CRITICAL #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{output_url} #{perfdata}"
     exit EXIT_CRITICAL
-  elsif (total >= @@options[:warning].to_i)
+  elsif (total >= @@options[:warning].to_f)
     puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{output_url} #{perfdata}"
     exit EXIT_WARNING
   else
@@ -139,10 +139,10 @@ if (@@options[:critical].to_i > @@options[:warning].to_i)
     exit EXIT_OK
   end
 else
-  if (total <= @@options[:critical].to_i)
+  if (total <= @@options[:critical].to_f)
     puts "CRITICAL #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:critical]} #{output_url} #{perfdata}"
     exit EXIT_CRITICAL
-  elsif (total <= @@options[:warning].to_i)
+  elsif (total <= @@options[:warning].to_f)
     puts "WARNING #{@@options[:message]} #{total}#{@@options[:units]} threshold: #{@@options[:warning]} #{output_url} #{perfdata}"
     exit EXIT_WARNING
   else
