@@ -92,11 +92,12 @@ data = {}
 data["total"] = 0
 
 begin
-  if JSON.parse(RestClient.get(URI.encode(url))).empty?
+  response = JSON.parse(RestClient.get(URI.encode(url)))
+  if response.empty?
     puts "UNKNOWN no data reported by Graphite"
     exit EXIT_UNKNOWN
   else
-    JSON.parse(RestClient.get(URI.encode(url))).each do |cache|
+    response.each do |cache|
       data["#{cache['target']}"] = 0
       count = 0
       cache["datapoints"].each do |point|
